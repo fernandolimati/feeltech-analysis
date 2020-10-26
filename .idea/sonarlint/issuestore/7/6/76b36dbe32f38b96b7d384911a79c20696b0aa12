@@ -1,0 +1,34 @@
+
+L
+java:S1066k"/Merge this if statement with the enclosing one.(¹á‡8þåå¯Ö.
+v	java:S115"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(¯­¾¹8¤ÜÜ«Ö.
+S
+java:S1143”"5Remove this return statement from this finally block.(±·8Ž¢¬Ö.
+g
+java:S2095"DUse try-with-resources or close this "Stream" in a "finally" clause.(ðá«ìøÿÿÿÿ8Ž¢¬Ö.
+b
+java:S2147{"ECombine this catch with the one at line 121, which has the same body.(ï­£Ä8Ôâ¯Ö.
+b
+java:S1124"EReorder the modifiers to comply with the Java Language Specification.(©ƒ¶8âÇÄªÖ.
+k
+java:S4042k"NUse "java.nio.file.Files#delete" here for better messages on error conditions.(¹á‡8ïå¯Ö.
+=
+java:S2129u" Remove this "String" constructor(Å´µì8Ÿý¨¬Ö.
+b
+java:S1124"EReorder the modifiers to comply with the Java Language Specification.(ê˜Ù‚8âÇÄªÖ.
+F	java:S108’")Either remove or fill this block of code.(”ý¾8Ž¢¬Ö.
+v	java:S115"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(ê˜Ù‚8Ñ”³©Ö.
+b
+java:S1124"EReorder the modifiers to comply with the Java Language Specification.(¯­¾¹8¤ÜÜ«Ö.
+E
+java:S3010&"(Remove this assignment of "homePathEnv".(óÐÒ’8âÇÄªÖ.
+W	java:S899k";Do something with the "boolean" value returned by "delete".(¹á‡8ïå¯Ö.
+v	java:S115"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(©ƒ¶8âÇÄªÖ.
+E
+java:S3010'"(Remove this assignment of "homePathEnv".(ÈÐâ”8âÇÄªÖ.
+p
+java:S2095r"NUse try-with-resources or close this "FileOutputStream" in a "finally" clause.(•ƒü˜þÿÿÿÿ8ÒÒ˜¬Ö.
+T
+java:S1128"2Remove this unused import 'java.util.Collections'.(¢³ïÓþÿÿÿÿ8®š¯Ö.
+E	java:S108`")Either remove or fill this block of code.(ï­£Ä8™…Æ«Ö.
+>	java:S131Q""Add a default case to this switch.(æšÿ”8¦¯ÒªÖ.
