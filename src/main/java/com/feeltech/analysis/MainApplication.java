@@ -1,6 +1,6 @@
 package com.feeltech.analysis;
 
-import com.feeltech.analysis.util.FileUtil;
+import com.feeltech.analysis.controller.FileAnalysisController;
 
 import java.io.FileNotFoundException;
 
@@ -12,7 +12,14 @@ import java.io.FileNotFoundException;
 public class MainApplication {
 
     public static void main(String[] args) throws FileNotFoundException {
-        FileUtil.getInstance().processInputFiles();
+        while(true){
+            FileAnalysisController.getInstance().processInputFiles();
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+            }
+        }
+
     }
 
 }

@@ -1,4 +1,4 @@
-package com.feeltech.analysis.util;
+package com.feeltech.analysis.controller;
 
 import com.feeltech.analysis.model.Client;
 import com.feeltech.analysis.model.Sale;
@@ -12,7 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,18 +21,17 @@ import java.util.stream.Collectors;
  **/
 
 
-public class FileUtil {
+public class FileAnalysisController {
 
-
-    private final static String fileInExtension = ".dat";
-    private final static String fileOutExtension = ".done.dat";
-    private final static String columnSeparator = "\\u00E7";
+    private final static String FILE_IN_EXTENSION = ".dat";
+    private final static String FILE_OUT_EXTENSION = ".done.dat";
+    private final static String COLUMN_SEPARATOR = "\\u00E7";
     private String dataInFolderPath;
     private String dataOutFolderPath;
     private static String homePathEnv;
-    private static FileUtil instance;
+    private static FileAnalysisController instance;
 
-    private FileUtil() {
+    private FileAnalysisController() {
         String winHomeDrive = System.getenv("HOMEDRIVE");
         if(!winHomeDrive.isEmpty()) homePathEnv = new StringBuilder().append(winHomeDrive).append(System.getenv ("HOMEPATH")).toString();
         else homePathEnv = System.getenv ("HOMEPATH");
@@ -51,8 +49,8 @@ public class FileUtil {
                 .toString();
     }
 
-    public static synchronized FileUtil getInstance() {
-        if (instance == null) instance = new FileUtil();
+    public static synchronized FileAnalysisController getInstance() {
+        if (instance == null) instance = new FileAnalysisController();
         return instance;
     }
 
@@ -77,7 +75,7 @@ public class FileUtil {
         try {
             List<String> lines = Files.readAllLines(file.toPath());
             for(String line:lines){
-                String[] column = line.split(columnSeparator);
+                String[] column = line.split(COLUMN_SEPARATOR);
                 switch (column[0]){
                     case "001":
                         Vendor v = new Vendor(column[1],column[2],Double.parseDouble(column[3]));
@@ -109,7 +107,7 @@ public class FileUtil {
     }
 
     private boolean writeOutputFile(String fileName, List<String> reportText){
-        String fileOutputPath = new StringBuilder().append(dataOutFolderPath).append(fileName.replace(fileInExtension,fileOutExtension)).toString();
+        String fileOutputPath = new StringBuilder().append(dataOutFolderPath).append(fileName.replace(FILE_IN_EXTENSION,FILE_OUT_EXTENSION)).toString();
         try {
             FileOutputStream outputStream = new FileOutputStream(fileOutputPath);
             for(String line:reportText){
@@ -140,7 +138,7 @@ public class FileUtil {
         try {
             filesInFolder = Files.walk(Paths.get(folder.getPath()))
                     .filter(Files::isRegularFile)
-                    .filter(f -> f.toString().endsWith(fileInExtension))
+                    .filter(f -> f.toString().endsWith(FILE_IN_EXTENSION))
                     .map(Path::toFile)
                     .collect(Collectors.toList());
         } catch (Exception e){
