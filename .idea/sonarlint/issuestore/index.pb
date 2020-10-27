@@ -9,7 +9,11 @@ g
 7src/main/java/com/feeltech/analysis/model/SaleItem.java,0\e\0ef7335a585ca49c22772f8bda1f20cc4fbbde2a
 c
 3src/main/java/com/feeltech/analysis/model/Sale.java,f\a\fa6d0f558b4e574aaca4846377e66fa4edbf529d
-f
-6src/main/java/com/feeltech/analysis/util/FileUtil.java,7\6\76b36dbe32f38b96b7d384911a79c20696b0aa12
 h
 8src/main/java/com/feeltech/analysis/MainApplication.java,7\f\7f6071b0b6738c880dd15ee463347b84f2d92b88
+z
+Jsrc/main/java/com/feeltech/analysis/controller/FileAnalysisController.java,8\7\876f7a26e64e789be6fcd6ed23eccca073a60e52
+S
+#src/test/java/FileAnalysisTest.java,5\2\5248340ad48a1d28c14e7ccf6ad68f8040ecd269
+9
+	README.md,8\e\8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d

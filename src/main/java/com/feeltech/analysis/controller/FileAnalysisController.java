@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,30 +24,30 @@ import java.util.stream.Collectors;
 
 public class FileAnalysisController {
 
-    private final static String FILE_IN_EXTENSION = ".dat";
-    private final static String FILE_OUT_EXTENSION = ".done.dat";
-    private final static String COLUMN_SEPARATOR = "\\u00E7";
-    private String dataInFolderPath;
-    private String dataOutFolderPath;
-    private static String homePathEnv;
+    private static final String FILE_IN_EXTENSION = ".dat";
+    private static final String FILE_OUT_EXTENSION = ".done.dat";
+    private static final String COLUMN_SEPARATOR = "\\u00E7";
+    private final String dataInFolderPath;
+    private final String dataOutFolderPath;
     private static FileAnalysisController instance;
 
     private FileAnalysisController() {
+        String homePathEnv;
         String winHomeDrive = System.getenv("HOMEDRIVE");
-        if(!winHomeDrive.isEmpty()) homePathEnv = new StringBuilder().append(winHomeDrive).append(System.getenv ("HOMEPATH")).toString();
+        if(!winHomeDrive.isEmpty()) homePathEnv = winHomeDrive.concat(System.getenv("HOMEPATH"));
         else homePathEnv = System.getenv ("HOMEPATH");
-        dataInFolderPath = new StringBuilder()
-                .append(homePathEnv)
-                .append(File.separator).append("data")
-                .append(File.separator).append("in")
-                .append(File.separator)
-                .toString();
-        dataOutFolderPath = new StringBuilder()
-                .append(homePathEnv)
-                .append(File.separator).append("data")
-                .append(File.separator).append("out")
-                .append(File.separator)
-                .toString();
+        String dataPath = homePathEnv
+                .concat(File.separator)
+                .concat("data")
+                .concat(File.separator);
+
+        dataInFolderPath = dataPath
+                .concat("in")
+                .concat(File.separator);
+
+        dataOutFolderPath = dataPath
+                .concat("out")
+                .concat(File.separator);
     }
 
     public static synchronized FileAnalysisController getInstance() {
@@ -54,97 +55,82 @@ public class FileAnalysisController {
         return instance;
     }
 
-    public void processInputFiles(){
-        List<File> inputFiles = null;
-        try {
-            inputFiles = readAllInputFiles();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+    public void generateReportFromAllFiles() throws IOException {
+        File folderIn = new File(dataInFolderPath);
 
-        for(File file:inputFiles){
-            processFile(file);
+        if(!folderIn.exists()) throw new FileNotFoundException("Input folder not found, path: ".concat(dataInFolderPath));
+
+        List<File> inputFiles;
+        inputFiles = readAllInputFilesFromFolder(folderIn);
+
+        for(File fileInput:inputFiles) {
+            if(!isInputFileAlreadyDone(fileInput))
+                generateFileReport(fileInput);
         }
 
     }
 
-    private void processFile(File file){
+    private boolean isInputFileAlreadyDone(File fileInput){
+        return new File(dataOutFolderPath.concat(fileInput.getName().replace(".dat",".done.dat"))).exists();
+    }
+
+    private void generateFileReport(File file) throws IOException {
         List<Vendor> vendors = new ArrayList<>();
         List<Client> clients = new ArrayList<>();
         List<Sale> sales = new ArrayList<>();
-        try {
-            List<String> lines = Files.readAllLines(file.toPath());
-            for(String line:lines){
-                String[] column = line.split(COLUMN_SEPARATOR);
-                switch (column[0]){
-                    case "001":
-                        Vendor v = new Vendor(column[1],column[2],Double.parseDouble(column[3]));
-                        vendors.add(v);
-                        break;
-                    case "002":
-                        Client c = new Client(column[1],column[2],column[3]);
-                        clients.add(c);
-                        break;
-                    case "003":
-                        Sale s = new Sale(column[1],column[2],column[3]);
-                        sales.add(s);
-                        break;
-                }
+        List<String> lines = Files.readAllLines(Paths.get(file.getPath()));
+        for(String line:lines){
+            String[] column = line.split(COLUMN_SEPARATOR);
+            switch (column[0]){
+                case "001":
+                    Vendor v = new Vendor(column[1],column[2],Double.parseDouble(column[3]));
+                    vendors.add(v);
+                    break;
+                case "002":
+                    Client c = new Client(column[1],column[2],column[3]);
+                    clients.add(c);
+                    break;
+                case "003":
+                    Sale s = new Sale(column[1],column[2],column[3]);
+                    sales.add(s);
+                    break;
+                default:
+                    break;
             }
-        } catch (IOException e) {
         }
+
+        sales.sort((o1, o2) -> Double.compare(o2.getBiggerSaleValue(), o1.getBiggerSaleValue()));
+        String biggerSaleID = sales.get(0).getBiggerSaleID();
+        sales.sort((o1, o2) -> Double.compare(o2.getTotalSaleValue(), o1.getTotalSaleValue()));
+        String worstSalesmanName = sales.get(sales.size()-1).getSalesmanName();
 
         List<String> reportText = new ArrayList<>();
-        reportText.add(new StringBuilder().append("Quantidade de clientes: ").append(clients.size()).toString());
-        reportText.add(new StringBuilder().append("Quantidade de vendedores: ").append(vendors.size()).toString());
-        sales.sort((o1, o2) -> Double.compare(o2.getBiggerSaleValue(), o1.getBiggerSaleValue()));
-        reportText.add(new StringBuilder().append("ID venda de maior valor: ").append(sales.get(0).getBiggerSaleID()).toString());
-        sales.sort((o1, o2) -> Double.compare(o2.getTotalSaleValue(), o1.getTotalSaleValue()));
-        reportText.add(new StringBuilder().append("Pior Vendedor: ").append(sales.get(sales.size()-1).getSalesmanName()).toString());
+        reportText.add("Quantidade de clientes: ".concat(String.valueOf(clients.size())));
+        reportText.add("Quantidade de vendedores: ".concat(String.valueOf(vendors.size())));
+        reportText.add("ID venda de maior valor: ".concat(biggerSaleID));
+        reportText.add("Pior Vendedor: ".concat(worstSalesmanName));
 
-        if(writeOutputFile(file.getName(), reportText)) if(file.exists())file.delete();
-
+        writeOutputFile(file.getName(), reportText);
     }
 
-    private boolean writeOutputFile(String fileName, List<String> reportText){
-        String fileOutputPath = new StringBuilder().append(dataOutFolderPath).append(fileName.replace(FILE_IN_EXTENSION,FILE_OUT_EXTENSION)).toString();
-        try {
-            FileOutputStream outputStream = new FileOutputStream(fileOutputPath);
-            for(String line:reportText){
-                outputStream.write(line.getBytes());
-                outputStream.write(new String("\n").getBytes());
-            }
-            outputStream.close();
-            return true;
-        } catch (FileNotFoundException e) {
-            return false;
-        } catch (IOException e) {
-            return false;
-        }
+    private List<File> readAllInputFilesFromFolder(final File folder) throws IOException {
+        List<File> filesInFolder;
+        filesInFolder = Files.walk(Paths.get(folder.getPath()))
+                .filter(Files::isRegularFile)
+                .filter(f -> f.toString().endsWith(FILE_IN_EXTENSION))
+                .map(Path::toFile)
+                .collect(Collectors.toList());
+        return filesInFolder;
     }
 
-    private List<File> readAllInputFiles() throws FileNotFoundException {
-        File folderIn = new File(dataInFolderPath);
-        File folderOut = new File(dataOutFolderPath);
+    private void writeOutputFile(String fileName, List<String> reportText) throws IOException {
+        String fileOutputPath = dataOutFolderPath.concat(fileName.replace(FILE_IN_EXTENSION, FILE_OUT_EXTENSION));
+        new File(dataOutFolderPath).mkdirs();
+        FileOutputStream outputStream = new FileOutputStream(fileOutputPath);
 
-        if(!folderIn.exists()) throw new FileNotFoundException(new StringBuilder().append("Folder not found, path: ").append(dataInFolderPath).toString());
-        if(!folderOut.exists()) folderOut.mkdirs();
+        for(String line:reportText) outputStream.write(line.concat("\n").getBytes(Charset.forName("UTF-8")));
 
-        return listFilesFromFolder(folderIn);
-    }
-
-    private List<File> listFilesFromFolder(final File folder) {
-        List<File> filesInFolder = null;
-        try {
-            filesInFolder = Files.walk(Paths.get(folder.getPath()))
-                    .filter(Files::isRegularFile)
-                    .filter(f -> f.toString().endsWith(FILE_IN_EXTENSION))
-                    .map(Path::toFile)
-                    .collect(Collectors.toList());
-        } catch (Exception e){
-        } finally {
-            return filesInFolder;
-        }
+        outputStream.close();
     }
 
 }
