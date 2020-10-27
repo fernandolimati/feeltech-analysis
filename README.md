@@ -45,6 +45,16 @@ Exemplo usado no teste:
 003ç08ç[1-34-10,2-33-1.50,3-40-0.10]çPaulo
 ~~~
 
+Saida esperada:  
+~~~
+Quantidade de clientes no arquivo de entrada
+Quantidade de vendedor no arquivo de entrada
+ID da venda mais cara
+O pior vendedor
+
+Arquivo de saida: {flat_file_name} .done.dat
+~~~
+
 Gerar .jar executavel:
 ~~~
 mvn clean compile assembly:single
